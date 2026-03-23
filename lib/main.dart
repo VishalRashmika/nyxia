@@ -1,122 +1,116 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import './core/constants/firebase_options.dart';
+import './presentation/views/themes/theme_provider.dart';
+import 'data/repositories/auth_service/auth_service.dart';
+import 'data/repositories/apod_service/apod_service.dart';
+import 'presentation/viewmodels/loading_viewmodel.dart';
+import 'presentation/viewmodels/welcome_viewmodel.dart';
+import 'presentation/viewmodels/login_viewmodel.dart';
+import 'presentation/viewmodels/signup_viewmodel.dart';
+import 'presentation/viewmodels/home_viewmodel.dart';
+import 'presentation/viewmodels/tabs/home_tab_viewmodel.dart';
+import 'presentation/viewmodels/tabs/plan_tab_viewmodel.dart';
+import 'presentation/viewmodels/tabs/track_tab_viewmodel.dart';
+import 'presentation/viewmodels/tabs/you_tab_viewmodel.dart';
+import 'presentation/viewmodels/equipment_viewmodel.dart';
+import 'presentation/viewmodels/space_pictures_viewmodel.dart';
+import 'presentation/views/screens/loading/loading_screen.dart';
 
-void main() {
-  runApp(const MyApp());
-}
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  // load environment variables
+  await dotenv.load(fileName: '.env');
 
-  // This widget is the root of your application.
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // TRY THIS: Try running your application with "flutter run". You'll see
-        // the application has a purple toolbar. Then, without quitting the app,
-        // try changing the seedColor in the colorScheme below to Colors.green
-        // and then invoke "hot reload" (save your changes or press the "hot
-        // reload" button in a Flutter-supported IDE, or press "r" if you used
-        // the command line to start the app).
-        //
-        // Notice that the counter didn't reset back to zero; the application
-        // state is not lost during the reload. To reset the state, use hot
-        // restart instead.
-        //
-        // This works for code too, not just values: Most code changes can be
-        // tested with just a hot reload.
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-      ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
-    );
-  }
-}
+  // initialize firebase
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
-
-  // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object (defined below) that contains fields that affect
-  // how it looks.
-
-  // This class is the configuration for the state. It holds the values (in this
-  // case the title) provided by the parent (in this case the App widget) and
-  // used by the build method of the State. Fields in a Widget subclass are
-  // always marked "final".
-
-  final String title;
-
-  @override
-  State<MyHomePage> createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
-
-  void _incrementCounter() {
-    setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
-      _counter++;
-    });
+  // set auth persistence where supported
+  try {
+    await FirebaseAuth.instance.setPersistence(Persistence.LOCAL);
+  } catch (e) {
+    debugPrint('Auth persistence setting not available on this platform');
   }
 
-  @override
-  Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
-    return Scaffold(
-      appBar: AppBar(
-        // TRY THIS: Try changing the color here to a specific color (to
-        // Colors.amber, perhaps?) and trigger a hot reload to see the AppBar
-        // change color while the other colors stay the same.
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
-        title: Text(widget.title),
-      ),
-      body: Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
-        child: Column(
-          // Column is also a layout widget. It takes a list of children and
-          // arranges them vertically. By default, it sizes itself to fit its
-          // children horizontally, and tries to be as tall as its parent.
-          //
-          // Column has various properties to control how it sizes itself and
-          // how it positions its children. Here we use mainAxisAlignment to
-          // center the children vertically; the main axis here is the vertical
-          // axis because Columns are vertical (the cross axis would be
-          // horizontal).
-          //
-          // TRY THIS: Invoke "debug painting" (choose the "Toggle Debug Paint"
-          // action in the IDE, or press "p" in the console), to see the
-          // wireframe for each widget.
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            const Text('You have pushed the button this many times:'),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headlineMedium,
-            ),
-          ],
+  // load saved theme
+  final themeProvider = ThemeProvider();
+  await themeProvider.loadThemePreference();
+
+  runApp(
+    MultiProvider(
+      providers: [
+        // services
+        Provider<AuthService>(create: (_) => AuthService()),
+        Provider<ApodService>(create: (_) => ApodService()),
+
+        // theme
+        ChangeNotifierProvider<ThemeProvider>.value(value: themeProvider),
+
+        // auth view models
+        ChangeNotifierProvider<LoadingViewModel>(
+          create: (context) => LoadingViewModel(context.read<AuthService>()),
         ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
+        ChangeNotifierProvider<WelcomeViewModel>(
+          create: (context) => WelcomeViewModel(context.read<ApodService>()),
+        ),
+        ChangeNotifierProvider<LoginViewModel>(
+          create: (context) => LoginViewModel(
+            context.read<ApodService>(),
+            context.read<AuthService>(),
+          ),
+        ),
+        ChangeNotifierProvider<SignUpViewModel>(
+          create: (context) => SignUpViewModel(
+            context.read<ApodService>(),
+            context.read<AuthService>(),
+          ),
+        ),
+
+        // home view models
+        ChangeNotifierProvider<HomeViewModel>(create: (_) => HomeViewModel()),
+        ChangeNotifierProvider<HomeTabViewModel>(
+          create: (_) => HomeTabViewModel(),
+        ),
+        ChangeNotifierProvider<PlanTabViewModel>(
+          create: (_) => PlanTabViewModel(),
+        ),
+        ChangeNotifierProvider<TrackTabViewModel>(
+          create: (_) => TrackTabViewModel(),
+        ),
+        ChangeNotifierProvider<YouTabViewModel>(
+          create: (context) => YouTabViewModel(context.read<AuthService>()),
+        ),
+        ChangeNotifierProvider<EquipmentViewModel>(
+          create: (_) => EquipmentViewModel(),
+        ),
+        ChangeNotifierProvider<SpacePicturesViewModel>(
+          create: (context) =>
+              SpacePicturesViewModel(context.read<ApodService>()),
+        ),
+      ],
+      child: const NyxiaApp(),
+    ),
+  );
+}
+
+class NyxiaApp extends StatelessWidget {
+  const NyxiaApp({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Consumer<ThemeProvider>(
+      builder: (context, themeProvider, child) {
+        return MaterialApp(
+          title: 'Nyxia',
+          theme: themeProvider.currentTheme,
+          home: const LoadingScreen(),
+          debugShowCheckedModeBanner: false,
+        );
+      },
     );
   }
 }
