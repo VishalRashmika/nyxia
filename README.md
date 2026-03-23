@@ -1,82 +1,79 @@
 # Nyxia
 
-Nyxia is a Flutter-based astrophotography planner focused on helping users plan observation sessions, track sky conditions, and manage photography workflows in one app.
+<p align="center">
+    <img src="assets/logos/round-logo.png" alt="Nyxia Logo" width="140" />
+</p>
 
-## Overview
+<p align="center"><strong>Astrophotography planning for better nights under the stars.</strong></p>
 
-The app combines weather and location context, astronomy event planning, moon and aurora tracking, APOD-based image discovery, and equipment/event management.
+Nyxia is a Flutter app that helps photographers and stargazers plan observation sessions with weather insights, celestial tracking, practical calculators, and event management in one place.
 
-Core experience includes:
+## Table of Contents
 
-- Authentication with Firebase and Google sign-in
-- Home dashboard with location and observation-relevant data
-- Planning tab with calendar-based event management
-- Tracking tab for moon and aurora conditions
-- Tools including NPF and depth-of-field calculators
-- APOD gallery browsing with day navigation
+- [Features](#features)
+- [Tech Stack](#tech-stack)
+- [Getting Started](#getting-started)
+- [Environment Variables](#environment-variables)
+- [Project Structure](#project-structure)
+- [Screenshots](#screenshots)
+- [Testing](#testing)
+- [License](#license)
+
+## Features
+
+- Firebase and Google sign-in authentication flow
+- Session planning with calendar-based personal event management
+- Track tab for moon phase and aurora conditions
+- APOD gallery with day-by-day browsing
+- Utility tools including NPF and depth-of-field calculators
+- Location-aware experience for observation readiness
 
 ## Tech Stack
 
-- Flutter (Dart)
-- Provider for state management
-- Firebase Core/Auth/Firestore
+- Flutter + Dart
+- Provider (state management)
+- Firebase Core, Firebase Auth, Cloud Firestore
 - Google Sign-In
-- HTTP-based API integrations
 - Geolocator
-- Table Calendar
 - Shared Preferences
+- HTTP-based API integrations
 
-## Environment Variables
+## Getting Started
 
-Create a `.env` file in the project root (or copy from `.env.example`) and provide:
+### Prerequisites
+
+- Flutter SDK (stable channel)
+- Dart SDK compatible with the installed Flutter version
+- Android Studio and/or Xcode (for emulator/device targets)
+- Firebase project configuration files for target platforms
+
+### Install Dependencies
+
+```bash
+flutter pub get
+```
+
+### Configure Environment
+
+Copy `.env.example` to `.env` and set your API keys:
 
 ```env
 OPENWEATHER_API_KEY=your_openweather_api_key
 NASA_API_KEY=your_nasa_api_key
 ```
 
-## Getting Started
-
-### 1. Prerequisites
-
-- Flutter SDK (stable)
-- Dart SDK (as required by the Flutter version)
-- Android Studio or Xcode (for device/emulator targets)
-- Firebase project configuration for your target platforms
-
-### 2. Install dependencies
-
-```bash
-flutter pub get
-```
-
-### 3. Configure environment
-
-```bash
-cp .env.example .env
-```
-
-Then update values in `.env`.
-
-### 4. Run the app
+### Run the App
 
 ```bash
 flutter run
 ```
 
-## Testing
+## Environment Variables
 
-Run tests:
+Nyxia expects these variables in `.env`:
 
-```bash
-flutter test
-```
-
-Generate coverage:
-
-```bash
-flutter test --coverage
-```
+- `OPENWEATHER_API_KEY`
+- `NASA_API_KEY`
 
 ## Project Structure
 
@@ -94,40 +91,53 @@ lib/
         routes/
         viewmodels/
         views/
-            screens/
-            themes/
-            widgets/
+        widgets/
 ```
 
 ## Screenshots
 
-### Main Screens
+<p>
+    <img src="docs/loading-screen.jpeg" alt="Loading Screen" width="230" />
+    <img src="docs/welcome-screen.jpeg" alt="Welcome Screen" width="230" />
+    <img src="docs/signup-screen.jpeg" alt="Sign Up Screen" width="230" />
+</p>
 
-| Screen | Preview |
-| --- | --- |
-| Loading | ![Loading Screen](docs/loading%20Screen.jpeg) |
-| Home | ![Home Screen](docs/homepage.jpeg) |
-| Sign Up | ![Sign Up Screen](docs/signupScreen.jpeg) |
-| Track | ![Track Screen](docs/trackScreen.jpeg) |
-| Tools | ![Tools Screen](docs/tools.jpeg) |
-| My Events | ![My Events Screen](docs/myevents.jpeg) |
-| Gallery | ![Gallery Screen](docs/galleryScreen.jpeg) |
+<p>
+    <img src="docs/home-screen.jpeg" alt="Home Screen" width="230" />
+    <img src="docs/track-screen.jpeg" alt="Track Screen" width="230" />
+    <img src="docs/tools-screen.jpeg" alt="Tools Screen" width="230" />
+</p>
 
-### Additional Screens
+<p>
+    <img src="docs/events-screen.jpeg" alt="Events Screen" width="230" />
+    <img src="docs/my-events-screen.jpeg" alt="My Events Screen" width="230" />
+    <img src="docs/equipment-screen.jpeg" alt="Equipment Screen" width="230" />
+</p>
 
-![App Screenshot 1](docs/WhatsApp%20Image%202026-03-22%20at%2008.18.34%20(1).jpeg)
-![App Screenshot 2](docs/WhatsApp%20Image%202026-03-22%20at%2008.18.34%20(3).jpeg)
-![App Screenshot 3](docs/WhatsApp%20Image%202026-03-22%20at%2008.18.34%20(9).jpeg)
-![App Screenshot 4](docs/WhatsApp%20Image%202026-03-22%20at%2008.18.34%20(10).jpeg)
-![App Screenshot 5](docs/WhatsApp%20Image%202026-03-22%20at%2008.18.34%20(12).jpeg)
-![App Screenshot 6](docs/WhatsApp%20Image%202026-03-22%20at%2008.18.34.jpeg)
-![App Screenshot 7](docs/WhatsApp%20Image%202026-03-22%20at%2008.18.49.jpeg)
+<p>
+    <img src="docs/npf-calculator-screen.jpeg" alt="NPF Calculator Screen" width="230" />
+    <img src="docs/depth-of-field-screen.jpeg" alt="Depth of Field Screen" width="230" />
+    <img src="docs/gallery-screen.jpeg" alt="Gallery Screen" width="230" />
+</p>
 
-## Notes
+<p>
+    <img src="docs/profile-screen.jpeg" alt="Profile Screen" width="230" />
+</p>
 
-- Firebase options are configured through `lib/core/constants/firebase_options.dart`.
-- API keys are loaded from `.env` at app startup.
+## Testing
+
+Run all tests:
+
+```bash
+flutter test
+```
+
+Generate coverage:
+
+```bash
+flutter test --coverage
+```
 
 ## License
 
-This repository is licensed under the terms in the `LICENSE` file.
+This repository is licensed under the terms in the LICENSE file.
